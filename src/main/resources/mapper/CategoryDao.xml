@@ -121,4 +121,7 @@
     <select id="selectAll" resultType="com.demo.tree.entity.TreeNode">
       SELECT id,name title,ancestor pid FROM `category_tree` left join  category on category_tree.descendant=category.id where distance =1
     </select>
+    <select id="selectRoot" resultType="com.demo.tree.entity.Category">
+        SELECT * FROM `category` GROUP BY id   limit 1
+    </select>
 </mapper>

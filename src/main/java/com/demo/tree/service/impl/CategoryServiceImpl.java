@@ -120,8 +120,17 @@ public class CategoryServiceImpl implements CategoryService {
     public TreeNode selectAll() {
         List<TreeNode> treeNodes = categoryDao.selectAll();
 
-        //todo  查询根 id为0  是因为table.sql初始化给了根目录 0
-        Category category = categoryDao.selectById(0);
+
+        Category category = categoryDao.selectRoot();
+        //不存 储初始化一个默认的
+        if (null == category) {
+            category = new Category();
+            category.setName("根目录");
+            categoryDao.insert(category);
+            categoryDao.insertNode(category.getId());
+        }
+
+
         TreeNode root = new TreeNode();
         //根目录
         root.setId(category.getId());

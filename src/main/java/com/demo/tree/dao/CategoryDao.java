@@ -152,4 +152,10 @@ public interface CategoryDao {
 
 
     List<TreeNode> selectAll();
+
+    /**
+     * 查找最小的作为根目录
+     * @return
+     */
+    Category selectRoot();
 }
