@@ -41,3 +41,8 @@ CREATE TABLE `category_tree`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+/* 插入根分类 */
+INSERT INTO `category_tree` (ancestor,descendant,distance) VALUES (0, 0, 0);
+INSERT INTO `category` (`id`, `name`) VALUES (0, 'root');

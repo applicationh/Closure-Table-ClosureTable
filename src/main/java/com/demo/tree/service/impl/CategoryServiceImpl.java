@@ -120,7 +120,8 @@ public class CategoryServiceImpl implements CategoryService {
     public TreeNode selectAll() {
         List<TreeNode> treeNodes = categoryDao.selectAll();
 
-        Category category = categoryDao.selectById(1);
+        //todo  查询根 id为0  是因为table.sql初始化给了根目录 0
+        Category category = categoryDao.selectById(0);
         TreeNode root = new TreeNode();
         //根目录
         root.setId(category.getId());
