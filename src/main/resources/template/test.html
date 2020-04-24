@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>树组件</title>
+    <link rel="stylesheet" href="css/layui.css">
+</head>
+<style>
+    .treeClass{
+        border: 2px solid #eee;
+        margin: 20px 600px
+    }
+</style>
+<body>
+<div class="treeClass">
+<div class="layui-btn-container">
+    <button type="button" class="layui-btn layui-btn-sm" lay-demo="getChecked">获取选中节点数据</button>
+    <button type="button" class="layui-btn layui-btn-sm" lay-demo="setChecked">勾选指定节点</button>
+    <button type="button" class="layui-btn layui-btn-sm" lay-demo="reload">重载实例</button>
+</div>
+<div  id="test1"></div>
+</div>
+<script src="layui.js"></script>
+<script>
+    layui.use(['tree', 'util'], function(){
+        var tree = layui.tree;
+        var $ = layui.$;
+       var util = layui.util;
+
+
+        function  getData() {
+            var data=[];
+            $.ajax({
+                url:'/category/queryAll',
+                async:false,
+                success:function (res) {
+                    data=res;
+                }
+            });
+            return data;
+        }
+
+        //渲染
+        var inst1 = tree.render({
+            elem: '#test1'  //绑定元素
+            ,id:'demoId1'
+            ,data: getData()
+            , showCheckbox: true
+            ,onlyIconControl: true
+            ,edit: ['add', 'update', 'del']
+            ,click: function(obj){
+                var data = obj.data;  //获取当前点击的节点数据
+                layer.msg('状态：'+ obj.state + '<br>节点数据：' + JSON.stringify(data));
+            },operate: function(obj){
+                var type = obj.type; //得到操作类型：add、edit、del
+                var data = obj.data; //得到当前节点的数据
+
+                var id = data.id;
+                var name = data.title;
+                if(type === 'add'){ //增加节点
+                    $.post("category/insert", {parent: id, name: "未命名"}, function (result) {
+                        tree.reload('demoId1', {data: getData()});
+                    })
+                    //返回 key 值
+                    return ;
+                } else if(type === 'update'){ //修改节点
+                    $.ajax({
+                        type: 'POST',
+                        url: 'category/update',
+                        contentType: "application/json;charset=UTF-8",
+                        data:  JSON.stringify({id: id, name: name}),
+                        success: function () {
+                            tree.reload('demoId1', {data: getData()})
+                        },
+
+                    });
+                } else if(type === 'del'){ //删除节点
+                    $.get("category/delete", {id: id}, function () {
+                        tree.reload('demoId1', {data: getData()});
+                    });
+                };
+            }
+        });
+
+
+        //按钮事件
+        util.event('lay-demo', {
+            getChecked: function(othis){
+                var checkedData = tree.getChecked('demoId1'); //获取选中节点的数据
+
+                layer.alert(JSON.stringify(checkedData), {shade:0});
+                console.log(checkedData);
+            }
+            ,setChecked: function(){
+                tree.setChecked('demoId1', [12, 16]); //勾选指定节点
+            }
+            ,reload: function(){
+                //重载实例
+                tree.reload('demoId1', {
+
+                });
+
+            }
+        });
+
+
+    });
+</script>
+</body>
+</html>

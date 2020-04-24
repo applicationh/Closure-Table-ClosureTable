@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.tree.dao.CategoryDao">
+
+    <resultMap type="com.demo.tree.entity.Category" id="CategoryMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap type="com.demo.tree.entity.CategoryTree" id="CategoryTreeMap">
+        <result property="ancestor" column="ancestor" jdbcType="INTEGER"/>
+        <result property="descendant" column="descendant" jdbcType="INTEGER"/>
+        <result property="distance" column="distance" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个所有详情-->
+    <select id="selectById" resultMap="CategoryMap">
+        select
+          id, name
+        from category
+        where id = #{id}
+    </select>
+    <select id="count" resultType="integer">
+        SELECT COUNT(*)-1 FROM category
+    </select>
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into category(name)
+        values (#{name})
+    </insert>
+    <insert id="insertNode" parameterType="int">
+        INSERT INTO category_tree(ancestor,descendant,distance) VALUES(#{id},#{id},0)
+    </insert>
+    <insert id="insertPath">
+        INSERT INTO category_tree(ancestor,descendant,distance)
+            (SELECT ancestor,#{id},distance+1 FROM category_tree WHERE descendant=#{parent})
+
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update category
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from category where id = #{id}
+    </delete>
+    <delete id="deletePath" parameterType="int">
+        DELETE FROM category_tree WHERE descendant=#{id}
+    </delete>
+
+    <select id="selectCountByLayer" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COUNT(*) FROM category_tree WHERE ancestor=0 AND distance=#{layer}
+    </select>
+    <select id="selectDescendant" resultMap="CategoryMap" parameterType="int">
+            SELECT
+                B.*
+            FROM
+                category_tree AS A
+                JOIN category AS B ON A.descendant = B.id
+            WHERE
+                ancestor = #{id} AND distance &gt;  0
+    </select>
+    <select id="selectDescendantId" parameterType="int">
+        SELECT descendant FROM category_tree WHERE ancestor=#{id} AND distance &gt; 0
+    </select>
+    <select id="selectSubLayer" resultMap="CategoryMap">
+        SELECT
+            B.*
+        FROM
+            category_tree AS A
+            JOIN category AS B ON A.descendant = B.id
+        WHERE
+            A.ancestor = #{ancestor} AND A.distance=#{n}
+    </select>
+    <select id="selectAncestor" resultType="java.lang.Integer">
+        SELECT ancestor FROM category_tree WHERE descendant=#{id} AND distance=#{n}
+    </select>
+    <select id="selectPathToRoot" resultMap="CategoryMap" parameterType="int">
+        SELECT
+            B.*
+        FROM
+            category_tree AS A
+            JOIN category AS B ON A.ancestor = B.id
+        WHERE
+            descendant = #{id} AND ancestor &gt;  0 ORDER BY distance DESC
+    </select>
+    <select id="selectPathToAncestor" resultType="com.demo.tree.entity.Category">
+        SELECT
+          B.*
+        FROM
+          category_tree AS A
+        JOIN category AS B ON A.ancestor = B.id
+        WHERE
+          descendant = #{id} AND
+          distance &lt; (
+                SELECT  distance
+                FROM
+                category_tree
+                WHERE
+                descendant = #{id} AND ancestor=#{ancestor})
+        ORDER BY
+        distance DESC
+
+    </select>
+    <select id="selectSubId"  resultType="java.lang.Integer">
+        SELECT descendant FROM category_tree WHERE ancestor=#{parent} AND distance=1
+    </select>
+    <select id="selectDistance" resultType="java.lang.Integer">
+        SELECT distance FROM category_tree WHERE descendant=#{id} AND ancestor=#{ancestor}
+    </select>
+    <select id="contains" resultType="java.lang.Boolean" parameterType="int">
+        SELECT 1 FROM category WHERE id=#{id}
+    </select>
+    <select id="selectAll" resultType="com.demo.tree.entity.TreeNode">
+      SELECT id,name title,ancestor pid FROM `category_tree` left join  category on category_tree.descendant=category.id where distance =1
+    </select>
+</mapper>
