@@ -60,8 +60,12 @@ public class CategoryController {
     }
 
     @GetMapping("delete")
-    public void delete(Integer id) {
+    public boolean delete(Integer id) {
+        if (categoryService.selectRoot().getId() == id) {
+            return false;
+        }
         categoryService.deleteAndMove(id);
+        return true;
     }
     @PostMapping("update")
     public void update(@RequestBody Category category) {

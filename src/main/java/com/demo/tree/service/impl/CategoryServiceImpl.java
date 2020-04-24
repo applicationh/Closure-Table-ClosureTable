@@ -23,6 +23,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Resource
     private CategoryDao categoryDao;
 
+    @Override
+    public Category selectRoot() {
+        return categoryDao.selectRoot();
+    }
+
     /**
      * 通过ID查询单条数据
      *

@@ -75,7 +75,12 @@
 
                     });
                 } else if(type === 'del'){ //删除节点
-                    $.get("category/delete", {id: id}, function () {
+                    $.get("category/delete", {id: id}, function (res) {
+                        if(res){
+                            layer.msg("删除成功")
+                        }else{
+                            layer.msg("删除失败，根目录不许删除")
+                        }
                         tree.reload('demoId1', {data: getData()});
                     });
                 };

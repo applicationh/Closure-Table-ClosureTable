@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface CategoryService {
 
+    Category selectRoot();
     /**
      * 通过ID查询单条数据
      */
