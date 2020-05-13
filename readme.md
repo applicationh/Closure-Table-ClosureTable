@@ -3,6 +3,7 @@
 
 网上资料基于ClosureTable实例应用较少不完整，大部分都是讲的数据库层次
 综合网上资料及参考已有代码[ClosureTableCateogryStore](https://github.com/Kaciras/ClosureTableCateogryStore)进行完整项目整合
+更具体在项目中的应用可以参考我旁边的项目，添加了节点的信息（url、权限编码、排序、类型等等），当然那个里面耦合了layui的数据结构和一些交互，建议还是从这个项目自己开发拓展吧
 
 
 
@@ -17,8 +18,8 @@
 
 缺点
 
-* 去除充血模型导致serviceImpl过于庞大，里面包含了的节点操作和查询操作
-* 未拓展维护category_tree添加是否有子父节点
+* 去除充血模型导致serviceImpl有点点庞大，里面包含了的节点操作和查询操作
+* 未拓展维护category_tree添加是否有子父节点（一个资料看到这个字段，有需要拓展把）
 
 
 # 表结构梳理
